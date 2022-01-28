@@ -11,9 +11,12 @@ The purpose of this project is to create a machine learning model and production
 
 # Results
 
-<img width="1336" alt="Untitled 2" src="https://user-images.githubusercontent.com/33467922/151483074-3570e30b-ebe5-4108-8c60-e92b7dc750fe.png">
 https://aiduate-dog-breed-classifier.herokuapp.com/
+
 Test accuracy: 81.2201%
+
+<img width="1186" alt="Untitled 3" src="https://user-images.githubusercontent.com/33467922/151484120-abdaf753-5483-470b-b54e-45000f2f2b05.png">
+
 
 ## To run the web app locally:
 
