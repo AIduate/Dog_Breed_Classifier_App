@@ -1,0 +1,17 @@
+{% extends "master.html" %}
+{% block title %}Results{% endblock %}
+
+{% block message %}
+    <hr />
+<h4 class="text-center">Results</h4>
+        <ul class="form-control form-group-lg" type="text-center" >
+          
+          {{result_dict.dog_breed}} 
+</br>
+</br>
+          <img id="picture" src="data:image/jpeg;base64,{{ img_data }}" style = "max-height:200px; transform:rotate(90deg)">
+                    <img id="picture" src="data:image/jpeg;base64,{{ img_data2 }}" style = "max-height:250px">
+        </div>
+    </div>
+
+{% endblock %}
