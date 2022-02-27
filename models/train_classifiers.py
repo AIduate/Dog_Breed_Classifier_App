@@ -1,15 +1,15 @@
 import cv2                
 import numpy as np
-from tensorflow.keras.applications.resnet50 import ResNet50, preprocess_input, decode_predictions
+from keras.applications.resnet50 import preprocess_input, decode_predictions
 from models.extract_bottleneck_features import *
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras.models import load_model#, Sequential
+from keras.preprocessing import image
+from keras.models import load_model#, Sequential
 #from tensorflow.keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D, Dropout, Flatten, Dense         
 #from tensorflow.keras.callbacks import ModelCheckpoint       
 #from tensorflow.keras import models     
 from tqdm import tqdm
 #from sklearn.datasets import load_files       
-import tensorflow.keras.utils as utils
+import keras.utils as utils
 from glob import glob
 
     
@@ -34,10 +34,10 @@ def paths_to_tensor(img_paths):
 
 def ResNet50_predict_labels(img_path):
     '''
-    Method to run preprocessing and prediction on image
+    Method to run preprocessing and prediction on image to be used in dog detector method
     '''
     # returns prediction vector for image located at img_path
-    ResNet50_model2 = ResNet50(weights='imagenet')
+    ResNet50_model2 = load_model("models/saved_models/ResNet50_model2")#ResNet50(weights='imagenet')#, input_shape=(224,224,3), pooling="avg") 
     img = preprocess_input(path_to_tensor(img_path))
     return np.argmax(ResNet50_model2.predict(img))
 
@@ -109,9 +109,11 @@ def Resnet50_predict_breed(img_path):
     '''
     ResNet50_model = load_model("models/saved_models/ResNet50_model")#train_dog_model()
     # extract bottleneck features
+    #bottleneck_feature = extract_Resnet50(path_to_tensor(img_path))
     bottleneck_feature = extract_Resnet50(path_to_tensor(img_path))
+    print(bottleneck_feature.shape)
     # obtain predicted vector
-    predicted_vector = ResNet50_model.predict(bottleneck_feature)
+    predicted_vector = ResNet50_model.predict(np.expand_dims(np.expand_dims(bottleneck_feature,axis=0),axis=0))
     # load list of dog names
     dog_names = [item[20:-1] for item in sorted(glob("models/data/dog_images/train/*/"))]
     # return dog breed that is predicted by the model
@@ -125,17 +127,12 @@ def dog_breed(img_path):
     if face_detector(img_path): 
 
         results = Resnet50_predict_breed(img_path)
-        #return 'Human detected that resembles a ' + results.replace('_', ' ')
         return results
-
     elif dog_detector(img_path):
 
         results = Resnet50_predict_breed(img_path)
         return results
-        #return 'Predicted dog breed: ' + results#.replace('_', ' ')
-
     else:
-
         return 'Error, no human or dog detected'
 
 if __name__ == '__main__':
