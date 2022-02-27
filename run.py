@@ -30,7 +30,10 @@ def go():
     breed = dog_breed(query).replace('es/train/', '')
 
     result_dict = {}
-    result_dict['dog_breed'] = "Predicted breed: " + breed.split('.')[1].replace('_', ' ')
+    try:
+        result_dict['dog_breed'] = "Predicted breed: " + breed.split('.')[1].replace('_', ' ')
+    except IndexError as e:
+        result_dict['dog_breed'] = "Predicted breed: " + breed
 
     #get input image
     im = Image.open("static/img/dog.png")
@@ -39,10 +42,14 @@ def go():
     encoded_img_data = base64.b64encode(data.getvalue())
     #classification_result = result_dict[classification_label]#dict(zip(dog_breed(query), classification_labels))
 
-    im2 = Image.open(glob.glob(f"models/data/dog_images/train/{breed}/*.jpg")[0])
-    data2 = io.BytesIO()
-    im2.save(data2, "JPEG")
-    encoded_img_data2 = base64.b64encode(data2.getvalue())
+    try:
+        im2 = Image.open(glob.glob(f"models/data/dog_images/train/{breed}/*.jpg")[0])
+        data2 = io.BytesIO()
+        im2.save(data2, "JPEG")
+        encoded_img_data2 = base64.b64encode(data2.getvalue())
+        img_data2=encoded_img_data2.decode('utf-8')
+    except IndexError as e:
+        img_data2 = ''
 
      # This will render the go.html Please see that file. 
     return render_template(
@@ -51,7 +58,7 @@ def go():
          result_dict=result_dict,
          filename = filename,
          img_data=encoded_img_data.decode('utf-8'),
-         img_data2=encoded_img_data2.decode('utf-8')
+         img_data2=img_data2
          #img_data=img_data
      )
 
