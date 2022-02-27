@@ -130,6 +130,11 @@ Test accuracy: 81.2201%
 
 2. Go to http://0.0.0.0:3001/
 
+# Conclusion
+
+In conclusion, this was a lot of fun and the ability to use pre-trained models and execute transfer learning is really valuable!
+There are a few points for improvement I would like to implement in the future for the breed classification model itself, its evaluation and the app functionality.
+
 # Improvement
 
 I hope to improve the project by: 
