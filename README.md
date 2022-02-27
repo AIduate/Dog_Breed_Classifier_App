@@ -2,10 +2,13 @@
 
 ## Table of contents
 * [Definition](#definition)
+* [EDA](#eda)
 * [Algorithms](#algorithms)
 * [Pre-Processing](#pre-processing)
 * [App](#app)
 * [Results](#results)
+* [Conclusion](#conclusion)
+* [Improvement](#improvement)
 * [Acknowledgements](#acknowledgements)
 * [Technologies](#technologies)
 * [Libraries](#libraries)
@@ -16,11 +19,38 @@
 The objective of this project is to build a web app that will detect human and dog faces in a user provided image and if detected, yield a breed that the image resembles.
 In order to accomplish this, pre-trained classifiers are used: HAAR CASCADE for face detection and ResNet50 CNNs for dog detection and ultimate breed classification.
 
-## Problem Statement:
+## Problem Statement
 
 Given any image provided from a user, if there is a dog or a human, classify the image by breed most resembled.
 
-# Algorithms:
+# EDA
+
+## Distribution of breed training data:
+![train_dist](https://user-images.githubusercontent.com/33467922/155903203-12ec54ea-7056-4565-a53f-ee316e5c4115.png)
+
+## Sample training images:
+
+### Alaskan Malamute:
+![Alaskan_malamute_00299](https://user-images.githubusercontent.com/33467922/155903294-f815a53a-a7b8-49b2-9554-24c494597701.jpg)
+
+### Basset Hound:
+![Basset_hound_01033](https://user-images.githubusercontent.com/33467922/155903300-b3fccee7-37cb-4036-a40d-943c768e431d.jpg)
+
+## Distribution of breed test data:
+![test_dist](https://user-images.githubusercontent.com/33467922/155903199-0f8f4503-e5bf-4ae2-9cdd-ba3109424fa0.png)
+
+## Sample test images
+
+### Alaskan Malamute
+![Alaskan_malamute_00309](https://user-images.githubusercontent.com/33467922/155903379-4d17f1a4-f858-4a59-aa02-5c6f97e9a920.jpg)
+
+### Basset Hound
+![Basset_hound_01034](https://user-images.githubusercontent.com/33467922/155903407-745d5893-0a72-43b5-a22e-844352c34c25.jpg)
+
+## Top breeds with change in distribution between train and test set
+<img width="569" alt="Top change in test dist" src="https://user-images.githubusercontent.com/33467922/155903068-cd378c4f-cba5-4d2e-864f-de0daf2c22fb.png">
+
+# Algorithms
 
 ## ResNet-50 model2
 The pre-trained ResNet-50 model used to detect dogs in images was "loaded with weights that have been trained on ImageNet, a very large, very popular dataset used for image classification and other vision tasks. ImageNet contains over 10 million URLs, each linking to an image containing an object from one of 1000 categories. Given an image, this pre-trained ResNet-50 model returns a prediction (derived from the available categories in ImageNet) for the object that is contained in the image." [1]
@@ -44,6 +74,8 @@ ResNet50_model.add(Dense(133, activation='softmax'))
 
 <img width="521" alt="ResNet50ModelSummary" src="https://user-images.githubusercontent.com/33467922/155898648-ea3631be-bb6b-4124-b813-aadf46602eeb.png">
 
+## Metrics
+
 " Before training a model, you need to configure the learning process, which is done via the compile method. It receives three arguments:
 1. an optimizer. This could be the string identifier of an existing optimizer (such as rmsprop or adagrad), or an instance of the Optimizer class.
 2. a loss function. This is the objective that the model will try to minimize. It can be the string identifier of an existing loss function (such as categorical_crossentropy or mse), or it can be an objective function. See: objectives.
@@ -52,6 +84,9 @@ ResNet50_model.add(Dense(133, activation='softmax'))
 ```ResNet50_model.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['accuracy'])```
 
 Saved the model with the best validation loss to be used in algorithm and in the web app.
+    - Accuracy is used due to Keras documentation suggestion: "For any classification problem you will want to set this to metrics=['accuracy']" [5]
+    
+** Performance on final breed classification model is done with accuracy to mirror guidance of ipython notebook but since there is class imbalance seen in EDA above, a better performance metric to evaluate performance would be f measure as it would be less bias towards higher distributed classes and balances between precision and recall.
 
 # Pre-Processing
 
@@ -83,6 +118,7 @@ test_ResNet50 = bottleneck_features['test']
 https://aiduate-dog-breed-classifier.herokuapp.com/
 
 Test accuracy: 81.2201%
+- Accuracy is not the best performance metric here because there is class imbalance between some of the breeds. (See EDA charts for visual of this)
 
 <img width="1186" alt="Untitled 3" src="https://user-images.githubusercontent.com/33467922/151484120-abdaf753-5483-470b-b54e-45000f2f2b05.png">
 
@@ -93,6 +129,14 @@ Test accuracy: 81.2201%
     `python run.py`
 
 2. Go to http://0.0.0.0:3001/
+
+# Improvement
+
+I hope to improve the project by: 
+- Adding more training data to the breed classifier + more breeds (my dog at home pictured in the app screenshot is an American Bully and is not a class currently)
+- Study and explore different CNN framework that may yield better performance
+- Improve Heroku hosted app by adding logic to catch error display in app error message for images where human or dog is not detected instead of Heroku app error
+- Evaluate performance more accurately
 
 # Acknowledgements
 1. Udacity
