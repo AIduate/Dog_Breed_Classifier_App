@@ -1,13 +1,82 @@
 # Dog_Breed_Classifier_App
 
-The purpose of this project is to create a machine learning model and productionalize it to an app! This was a lot of fun =)
-
 ## Table of contents
+* [Definition](#definition)
+* [Algorithms](#algorithms)
+* [Pre-Processing](#pre-processing)
+* [App](#app)
 * [Results](#results)
 * [Acknowledgements](#acknowledgements)
 * [Technologies](#technologies)
 * [Libraries](#libraries)
 * [Files](#files)
+
+# Definition
+
+The objective of this project is to build a web app that will detect human and dog faces in a user provided image and if detected, yield a breed that the image resembles.
+In order to accomplish this, pre-trained classifiers are used: HAAR CASCADE for face detection and ResNet50 CNNs for dog detection and ultimate breed classification.
+
+## Problem Statement:
+
+Given any image provided from a user, if there is a dog or a human, classify the image by breed most resembled.
+
+# Algorithms:
+
+## ResNet-50 model2
+The pre-trained ResNet-50 model used to detect dogs in images was "loaded with weights that have been trained on ImageNet, a very large, very popular dataset used for image classification and other vision tasks. ImageNet contains over 10 million URLs, each linking to an image containing an object from one of 1000 categories. Given an image, this pre-trained ResNet-50 model returns a prediction (derived from the available categories in ImageNet) for the object that is contained in the image." [1]
+
+Information on the OpenCV Haar Cascade Face Detector model: 
+- "Haar-like features are digital image features used in object recognition. ... A Haar-like feature considers adjacent rectangular regions at a specific location in a detection window, sums up the pixel intensities in each region and calculates the difference between these sums." [3]
+- Thousands of features regarding edges, lines and rectangles are "grouped into different stages of classifiers and applied one-by-one", the cascade.
+
+## ResNet-50 model
+
+### Transfer learning 
+
+Technique was used from pre-trained ResNet50 model to classify an image of a human or dog into a dog breed category.
+"The model uses the the pre-trained ResNet50 model as a fixed feature extractor, where the last convolutional output of ResNet50 is fed as input to our model. We only add a global average pooling layer and a fully connected layer, where the latter contains one node for each dog category and is equipped with a softmax." [1]
+
+```
+ResNet50_model = Sequential()
+ResNet50_model.add(GlobalAveragePooling2D(input_shape=train_ResNet50.shape[1:]))
+ResNet50_model.add(Dense(133, activation='softmax'))
+```
+
+<img width="521" alt="ResNet50ModelSummary" src="https://user-images.githubusercontent.com/33467922/155898648-ea3631be-bb6b-4124-b813-aadf46602eeb.png">
+
+" Before training a model, you need to configure the learning process, which is done via the compile method. It receives three arguments:
+1. an optimizer. This could be the string identifier of an existing optimizer (such as rmsprop or adagrad), or an instance of the Optimizer class.
+2. a loss function. This is the objective that the model will try to minimize. It can be the string identifier of an existing loss function (such as categorical_crossentropy or mse), or it can be an objective function. See: objectives.
+3. a list of metrics. For any classification problem you will want to set this to metrics=['accuracy']. A metric could be the string identifier of an existing metric (only accuracy is supported at this point), or a custom metric function." [5]
+
+```ResNet50_model.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['accuracy'])```
+
+Saved the model with the best validation loss to be used in algorithm and in the web app.
+
+# Pre-Processing
+
+- Before using the face detector, images must be converted to grayscale
+- "Keras ResNet50 CNN models require a 4D array (which we'll also refer to as a 4D tensor) as input, with shape: (nb_samples, rows, columns, channels), where nb_samples corresponds to the total number of images (or samples), and rows, columns, and channels correspond to the number of rows, columns, and channels for each image, respectively." [1]
+    - "The path_to_tensor function below takes a string-valued file path to a color image as input and returns a 4D tensor suitable for supplying to a Keras CNN. The function first loads the image and resizes it to a square image that is  pixels. Next, the image is converted to an array, which is then resized to a 4D tensor. In this case, since we are working with color images, each image has three channels." (1,224,224,3) [1]
+    -  "The paths_to_tensor function takes a numpy array of string-valued image paths as input and returns a 4D tensor" (nb_samples,224,224,3). "Here, nb_samples is the number of samples, or number of images, in the supplied array of image paths. It is best to think of nb_samples as the number of 3D tensors (where each 3D tensor corresponds to a different image) in our dataset" [1]
+    -  "Getting the 4D tensor ready for ResNet-50, and for any other pre-trained model in Keras, requires some additional processing." [1]
+    -  "First, the RGB image is converted to BGR by reordering the channels. All pre-trained models have the additional normalization step that the mean pixel (expressed in RGB as  and calculated from all pixels in all images in ImageNet) must be subtracted from every pixel in each image." [1] (This is implemented by preprocess_input function linked in acknowledgements section [4])
+
+- For the transfer learning portion, We created the bottleneck features corresponding to our own additional train, test, and validation sets (https://s3-us-west-1.amazonaws.com/udacity-aind/dog-project/dogImages.zip).
+
+```
+bottleneck_features = np.load('bottleneck_features/DogResnet50Data.npz')
+train_ResNet50 = bottleneck_features['train']
+valid_ResNet50 = bottleneck_features['valid']
+test_ResNet50 = bottleneck_features['test']
+```
+
+# App
+- Load saved models (except for haar face cascade) to execute on user provided images
+- Added form to receive user input image
+- Save user image and display after prediction
+- Save one picture per dog breed to load after prediction in addition to user image
+    - Use predicted breed to dynamically locate corresponding dog picture to display
 
 # Results
 
@@ -26,7 +95,11 @@ Test accuracy: 81.2201%
 2. Go to http://0.0.0.0:3001/
 
 # Acknowledgements
-* Udacity
+1. Udacity
+2. https://docs.opencv.org/3.4/d2/d99/tutorial_js_face_detection.html
+3. https://en.wikipedia.org/wiki/Haar-like_feature
+4. https://github.com/keras-team/keras/blob/master/keras/applications/imagenet_utils.py
+5. https://faroit.com/keras-docs/1.0.6/getting-started/sequential-model-guide/
 
 # Technologies
 * Python
